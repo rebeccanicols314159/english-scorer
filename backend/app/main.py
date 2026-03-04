@@ -6,6 +6,7 @@ from app.models import ScoreRequest, ScoreResponse, ScoreData, SubcategoryScores
 from app.scoring.engine import (
     count_words,
     compute_subcategory_scores,
+    compute_all_diagnostics,
     compute_overall_score,
     get_confidence_level,
     get_proficiency_level,
@@ -33,10 +34,11 @@ def score_text(request: ScoreRequest) -> ScoreResponse:
     word_count = count_words(text)
 
     subcategory_scores = compute_subcategory_scores(text)
+    diagnostics = compute_all_diagnostics(text)
     overall_score = compute_overall_score(subcategory_scores)
     confidence_level = get_confidence_level(word_count)
     proficiency_level = get_proficiency_level(overall_score)
-    feedback = generate_feedback(subcategory_scores)
+    feedback = generate_feedback(subcategory_scores, diagnostics)
 
     return ScoreResponse(
         success=True,

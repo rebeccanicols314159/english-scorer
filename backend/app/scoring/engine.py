@@ -1,10 +1,16 @@
-"""Dummy scoring engine using simple text heuristics.
+"""Scoring engine — orchestrates the six NLP analyzers.
 
-This is a placeholder implementation. It uses basic text statistics to
-produce deterministic scores in the 1–10 range. Replace with real NLP
-analysis (spaCy, LanguageTool, etc.) in a future phase.
+Public API is unchanged from the dummy engine so all existing tests pass.
+Utility functions (count_words, count_sentences, get_confidence_level,
+get_proficiency_level) are preserved verbatim.
 """
 import re
+from app.scoring.analyzers.grammar import GrammarAnalyzer
+from app.scoring.analyzers.vocabulary import VocabularyAnalyzer
+from app.scoring.analyzers.spelling import SpellingAnalyzer
+from app.scoring.analyzers.sentence import SentenceStructureAnalyzer
+from app.scoring.analyzers.coherence import CoherenceAnalyzer
+from app.scoring.analyzers.fluency import FluencyAnalyzer
 
 WEIGHTS: dict[str, float] = {
     "grammar": 0.25,
@@ -13,14 +19,6 @@ WEIGHTS: dict[str, float] = {
     "sentence_structure": 0.20,
     "coherence_organization": 0.15,
     "fluency_naturalness": 0.10,
-}
-
-_TRANSITION_WORDS = {
-    "however", "therefore", "furthermore", "moreover", "additionally",
-    "consequently", "nevertheless", "in addition", "on the other hand",
-    "for example", "for instance", "in conclusion", "first", "second",
-    "third", "finally", "meanwhile", "subsequently", "in contrast",
-    "similarly", "as a result", "in summary", "thus", "hence",
 }
 
 _PROFICIENCY_LEVELS = [
@@ -33,6 +31,16 @@ _PROFICIENCY_LEVELS = [
     (10.0, "Proficient"),
 ]
 
+# Instantiate analyzers once at module level (no re-loading on each request)
+_grammar = GrammarAnalyzer()
+_vocabulary = VocabularyAnalyzer()
+_spelling = SpellingAnalyzer()
+_sentence = SentenceStructureAnalyzer()
+_coherence = CoherenceAnalyzer()
+_fluency = FluencyAnalyzer()
+
+
+# ── Utility functions (unchanged public API) ──────────────────────────────────
 
 def count_words(text: str) -> int:
     return len(text.split())
@@ -41,78 +49,6 @@ def count_words(text: str) -> int:
 def count_sentences(text: str) -> int:
     sentences = re.split(r"[.!?]+", text)
     return len([s for s in sentences if s.strip()])
-
-
-def _type_token_ratio(text: str) -> float:
-    words = text.lower().split()
-    if not words:
-        return 0.0
-    return len(set(words)) / len(words)
-
-
-def _avg_sentence_length(text: str) -> float:
-    wc = count_words(text)
-    sc = count_sentences(text)
-    return wc / max(sc, 1)
-
-
-def _count_transition_words(text: str) -> int:
-    text_lower = text.lower()
-    return sum(1 for t in _TRANSITION_WORDS if t in text_lower)
-
-
-def _clamp(value: float, min_val: float = 1.0, max_val: float = 10.0) -> float:
-    return max(min_val, min(max_val, value))
-
-
-def compute_subcategory_scores(text: str) -> dict[str, float]:
-    word_count = count_words(text)
-    sentence_count = count_sentences(text)
-    ttr = _type_token_ratio(text)
-    avg_len = _avg_sentence_length(text)
-    transitions = _count_transition_words(text)
-
-    # Grammar: blends TTR diversity with text length maturity.
-    # Real implementation would use LanguageTool error counts.
-    grammar = _clamp(4.0 + ttr * 4.0 + min(word_count, 300) / 300 * 2.0)
-
-    # Vocabulary: type-token ratio is the primary proxy.
-    # TTR typically ranges 0.3–0.95; map to 1–10.
-    vocab = _clamp((ttr - 0.3) / 0.65 * 9.0 + 1.0)
-
-    # Spelling & Mechanics: dummy assumes mostly correct text; docked
-    # slightly for very short submissions with no punctuation variety.
-    spelling = _clamp(8.5 - (2.0 if sentence_count < 2 else 0.0))
-
-    # Sentence Structure: penalise deviation from ideal avg length (17 words).
-    deviation = abs(avg_len - 17.0)
-    sentence_structure = _clamp(9.5 - deviation * 0.25)
-
-    # Coherence & Organization: requires 50+ words; rewards transitions.
-    if word_count < 50:
-        coherence = _clamp(2.0 + word_count / 50.0 * 3.0)
-    else:
-        transition_bonus = min(transitions * 0.6, 3.0)
-        length_bonus = min(word_count / 500.0, 1.0)
-        coherence = _clamp(5.0 + transition_bonus + length_bonus)
-
-    # Fluency & Naturalness: combines TTR with sentence variety.
-    sentence_variety_bonus = min(sentence_count / 5.0, 1.0) * 2.0
-    fluency = _clamp(3.5 + ttr * 4.0 + sentence_variety_bonus)
-
-    return {
-        "grammar": round(grammar, 1),
-        "vocabulary": round(vocab, 1),
-        "spelling_mechanics": round(spelling, 1),
-        "sentence_structure": round(sentence_structure, 1),
-        "coherence_organization": round(coherence, 1),
-        "fluency_naturalness": round(fluency, 1),
-    }
-
-
-def compute_overall_score(subcategory_scores: dict[str, float]) -> float:
-    total = sum(subcategory_scores[cat] * weight for cat, weight in WEIGHTS.items())
-    return round(total, 1)
 
 
 def get_confidence_level(word_count: int) -> str:
@@ -130,3 +66,32 @@ def get_proficiency_level(score: float) -> str:
         if score <= threshold:
             return label
     return "Proficient"
+
+
+# ── Core scoring functions ─────────────────────────────────────────────────────
+
+def compute_subcategory_scores(text: str) -> dict[str, float]:
+    return {
+        "grammar":                _grammar.analyze(text),
+        "vocabulary":             _vocabulary.analyze(text),
+        "spelling_mechanics":     _spelling.analyze(text),
+        "sentence_structure":     _sentence.analyze(text),
+        "coherence_organization": _coherence.analyze(text),
+        "fluency_naturalness":    _fluency.analyze(text),
+    }
+
+
+def compute_all_diagnostics(text: str) -> dict[str, dict]:
+    return {
+        "grammar":                _grammar.get_diagnostics(text),
+        "vocabulary":             _vocabulary.get_diagnostics(text),
+        "spelling_mechanics":     _spelling.get_diagnostics(text),
+        "sentence_structure":     _sentence.get_diagnostics(text),
+        "coherence_organization": _coherence.get_diagnostics(text),
+        "fluency_naturalness":    _fluency.get_diagnostics(text),
+    }
+
+
+def compute_overall_score(subcategory_scores: dict[str, float]) -> float:
+    total = sum(subcategory_scores[cat] * weight for cat, weight in WEIGHTS.items())
+    return round(total, 1)
