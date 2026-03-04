@@ -122,6 +122,23 @@ class TestScoreEndpoint:
         )
         assert response.status_code == 422
 
+    async def test_error_response_has_success_false(self, client):
+        response = await client.post("/api/score", json={"text": "Too short."})
+        assert response.json()["success"] is False
+
+    async def test_error_response_has_error_field(self, client):
+        response = await client.post("/api/score", json={"text": "Too short."})
+        assert "error" in response.json()
+
+    async def test_error_response_has_code_invalid_input(self, client):
+        response = await client.post("/api/score", json={"text": "Too short."})
+        assert response.json()["error"]["code"] == "INVALID_INPUT"
+
+    async def test_error_response_has_message(self, client):
+        response = await client.post("/api/score", json={"text": "Too short."})
+        message = response.json()["error"]["message"]
+        assert isinstance(message, str) and len(message) > 0
+
     async def test_short_text_has_low_confidence(self, client):
         # < 30 words should return "low" confidence
         short_text = "I go to store. She like cat. He run fast. We are happy people here."

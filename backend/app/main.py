@@ -1,6 +1,8 @@
 """FastAPI application entry point."""
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.models import ScoreRequest, ScoreResponse, ScoreData, SubcategoryScores, SubcategoryFeedback
 from app.scoring.engine import (
@@ -14,6 +16,21 @@ from app.scoring.engine import (
 from app.scoring.feedback import generate_feedback
 
 app = FastAPI(title="English Scorer API", version="0.1.0")
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    messages = [err.get("msg", "Invalid input") for err in exc.errors()]
+    message = messages[0] if messages else "Invalid input"
+    # Strip the "Value error, " prefix Pydantic v2 adds to field_validator messages
+    message = message.removeprefix("Value error, ")
+    return JSONResponse(
+        status_code=422,
+        content={
+            "success": False,
+            "error": {"code": "INVALID_INPUT", "message": message},
+        },
+    )
+
 
 app.add_middleware(
     CORSMiddleware,

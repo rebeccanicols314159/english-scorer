@@ -70,26 +70,36 @@ def get_proficiency_level(score: float) -> str:
 
 # ── Core scoring functions ─────────────────────────────────────────────────────
 
+_FALLBACK_SCORE = 5.0
+
+_ANALYZERS = [
+    ("grammar",                _grammar),
+    ("vocabulary",             _vocabulary),
+    ("spelling_mechanics",     _spelling),
+    ("sentence_structure",     _sentence),
+    ("coherence_organization", _coherence),
+    ("fluency_naturalness",    _fluency),
+]
+
+
 def compute_subcategory_scores(text: str) -> dict[str, float]:
-    return {
-        "grammar":                _grammar.analyze(text),
-        "vocabulary":             _vocabulary.analyze(text),
-        "spelling_mechanics":     _spelling.analyze(text),
-        "sentence_structure":     _sentence.analyze(text),
-        "coherence_organization": _coherence.analyze(text),
-        "fluency_naturalness":    _fluency.analyze(text),
-    }
+    scores: dict[str, float] = {}
+    for name, analyzer in _ANALYZERS:
+        try:
+            scores[name] = analyzer.analyze(text)
+        except Exception:
+            scores[name] = _FALLBACK_SCORE
+    return scores
 
 
 def compute_all_diagnostics(text: str) -> dict[str, dict]:
-    return {
-        "grammar":                _grammar.get_diagnostics(text),
-        "vocabulary":             _vocabulary.get_diagnostics(text),
-        "spelling_mechanics":     _spelling.get_diagnostics(text),
-        "sentence_structure":     _sentence.get_diagnostics(text),
-        "coherence_organization": _coherence.get_diagnostics(text),
-        "fluency_naturalness":    _fluency.get_diagnostics(text),
-    }
+    diagnostics: dict[str, dict] = {}
+    for name, analyzer in _ANALYZERS:
+        try:
+            diagnostics[name] = analyzer.get_diagnostics(text)
+        except Exception:
+            diagnostics[name] = {}
+    return diagnostics
 
 
 def compute_overall_score(subcategory_scores: dict[str, float]) -> float:

@@ -1,11 +1,14 @@
 """Tests for the dummy scoring engine."""
 import pytest
+from unittest.mock import patch
+import app.scoring.engine as engine_module
 from app.scoring.engine import (
     count_words,
     count_sentences,
     get_confidence_level,
     get_proficiency_level,
     compute_subcategory_scores,
+    compute_all_diagnostics,
     compute_overall_score,
     WEIGHTS,
 )
@@ -220,3 +223,27 @@ class TestComputeOverallScore:
         subcategory_scores = {k: 1.0 for k in WEIGHTS}
         score = compute_overall_score(subcategory_scores)
         assert score == pytest.approx(1.0, abs=0.05)
+
+
+class TestAnalyzerFailureRecovery:
+    def test_failed_analyzer_returns_fallback_score(self):
+        with patch.object(engine_module._grammar, "analyze", side_effect=RuntimeError("NLP failure")):
+            scores = compute_subcategory_scores(SAMPLE_TEXT_MEDIUM)
+        assert scores["grammar"] == 5.0
+
+    def test_other_scores_unaffected_by_failed_analyzer(self):
+        with patch.object(engine_module._grammar, "analyze", side_effect=RuntimeError("NLP failure")):
+            scores = compute_subcategory_scores(SAMPLE_TEXT_MEDIUM)
+        for cat in ["vocabulary", "spelling_mechanics", "sentence_structure", "coherence_organization", "fluency_naturalness"]:
+            assert 1.0 <= scores[cat] <= 10.0, f"{cat} score {scores[cat]} out of range"
+
+    def test_failed_diagnostics_returns_empty_dict(self):
+        with patch.object(engine_module._grammar, "get_diagnostics", side_effect=RuntimeError("NLP failure")):
+            diag = compute_all_diagnostics(SAMPLE_TEXT_MEDIUM)
+        assert diag["grammar"] == {}
+
+    def test_other_diagnostics_unaffected_by_failed_analyzer(self):
+        with patch.object(engine_module._grammar, "get_diagnostics", side_effect=RuntimeError("NLP failure")):
+            diag = compute_all_diagnostics(SAMPLE_TEXT_MEDIUM)
+        for cat in ["vocabulary", "spelling_mechanics", "sentence_structure", "coherence_organization", "fluency_naturalness"]:
+            assert isinstance(diag[cat], dict)
