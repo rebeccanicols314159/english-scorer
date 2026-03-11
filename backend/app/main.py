@@ -14,6 +14,7 @@ from app.scoring.engine import (
     get_proficiency_level,
 )
 from app.scoring.feedback import generate_feedback
+from app.scoring.language_detection import is_english
 
 app = FastAPI(title="English Scorer API", version="0.1.0")
 
@@ -48,6 +49,19 @@ def health() -> dict:
 @app.post("/api/score", response_model=ScoreResponse)
 def score_text(request: ScoreRequest) -> ScoreResponse:
     text = request.text
+
+    if not is_english(text):
+        return JSONResponse(
+            status_code=422,
+            content={
+                "success": False,
+                "error": {
+                    "code": "NOT_ENGLISH",
+                    "message": "Text does not appear to be in English. Please submit English text.",
+                },
+            },
+        )
+
     word_count = count_words(text)
 
     subcategory_scores = compute_subcategory_scores(text)

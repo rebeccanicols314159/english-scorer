@@ -130,6 +130,27 @@ describe('App', () => {
     )
   })
 
+  it('renders example buttons', () => {
+    render(<App />)
+    expect(screen.getByRole('button', { name: /beginner/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /intermediate/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /advanced/i })).toBeInTheDocument()
+  })
+
+  it('clicking an example button populates the textarea', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: /beginner/i }))
+    expect(screen.getByRole('textbox').value.length).toBeGreaterThan(0)
+  })
+
+  it('clicking an example button enables the submit button', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: /intermediate/i }))
+    expect(screen.getByRole('button', { name: /score my english/i })).not.toBeDisabled()
+  })
+
   it('clears error and results when user edits text after scoring', async () => {
     scorer.scoreText.mockResolvedValue(mockResult)
     const user = userEvent.setup()
