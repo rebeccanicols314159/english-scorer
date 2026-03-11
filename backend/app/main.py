@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.models import ScoreRequest, ScoreResponse, ScoreData, SubcategoryScores, SubcategoryFeedback
+from app.rate_limiter import RateLimiter
 from app.scoring.engine import (
     count_words,
     compute_subcategory_scores,
@@ -17,6 +18,28 @@ from app.scoring.feedback import generate_feedback
 from app.scoring.language_detection import is_english
 
 app = FastAPI(title="English Scorer API", version="0.1.0")
+
+# 10 requests per 60 seconds per IP
+rate_limiter = RateLimiter(limit=10, window=60)
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    if request.url.path == "/api/score":
+        ip = request.client.host if request.client else "unknown"
+        if not rate_limiter.is_allowed(ip):
+            return JSONResponse(
+                status_code=429,
+                content={
+                    "success": False,
+                    "error": {
+                        "code": "RATE_LIMITED",
+                        "message": "Too many requests. Please wait a moment before trying again.",
+                    },
+                },
+            )
+    return await call_next(request)
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
