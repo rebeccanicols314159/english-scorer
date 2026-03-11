@@ -1,19 +1,26 @@
 const EXAMPLES = {
   Beginner:
+    "i am studing inglish becuase i want to comunicate with forein people. " +
+    "yesterday i writed a leter to my freind in america and he recieve it. " +
+    "my teacher she say i make alot of gramar mistaeks. " +
+    "i dont have very much vocablary but i try to lern new word every day. " +
+    "the inglish it is hard langauge for me to understood. " +
+    "my frend he also studyes inglish with i in the same clasroom.",
+  Intermediate:
     "I go to school yesterday and I have many friend there. " +
     "The teacher she very kind to us student. " +
     "We learn english grammar but it very hard for me. " +
     "My friend he don't understand also. " +
     "We both make many mistake on test. " +
     "I am not very good at english but I try my best every day.",
-  Intermediate:
+  Advanced:
     "Learning English has been challenging but also rewarding for me. " +
     "I have improved my vocabulary by reading English books every day. " +
     "However, I still make some mistakes with grammar, especially with tenses. " +
     "My speaking has also become more natural since I started practicing with native speakers. " +
     "In addition, I watch English movies to improve my listening skills. " +
     "I think that consistency is the key to success in language learning.",
-  Advanced:
+  Proficient:
     "The proliferation of digital technologies has fundamentally transformed the manner " +
     "in which contemporary societies engage with information. Consequently, educational " +
     "institutions are grappling with unprecedented challenges in preparing students for " +
