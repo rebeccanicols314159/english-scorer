@@ -135,6 +135,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: /beginner/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /intermediate/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /advanced/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /proficient/i })).toBeInTheDocument()
   })
 
   it('clicking an example button populates the textarea', async () => {

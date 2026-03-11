@@ -24,6 +24,11 @@ describe('ExampleButtons', () => {
     expect(screen.getByRole('button', { name: /advanced/i })).toBeInTheDocument()
   })
 
+  it('renders Proficient button', () => {
+    render(<ExampleButtons onLoadExample={() => {}} />)
+    expect(screen.getByRole('button', { name: /proficient/i })).toBeInTheDocument()
+  })
+
   it('calls onLoadExample with non-empty text when Beginner is clicked', async () => {
     const user = userEvent.setup()
     const onLoadExample = vi.fn()
@@ -51,6 +56,15 @@ describe('ExampleButtons', () => {
     expect(onLoadExample.mock.calls[0][0].length).toBeGreaterThan(0)
   })
 
+  it('calls onLoadExample with non-empty text when Proficient is clicked', async () => {
+    const user = userEvent.setup()
+    const onLoadExample = vi.fn()
+    render(<ExampleButtons onLoadExample={onLoadExample} />)
+    await user.click(screen.getByRole('button', { name: /proficient/i }))
+    expect(onLoadExample).toHaveBeenCalledOnce()
+    expect(onLoadExample.mock.calls[0][0].length).toBeGreaterThan(0)
+  })
+
   it('each button loads different text', async () => {
     const user = userEvent.setup()
     const texts = []
@@ -59,6 +73,7 @@ describe('ExampleButtons', () => {
     await user.click(screen.getByRole('button', { name: /beginner/i }))
     await user.click(screen.getByRole('button', { name: /intermediate/i }))
     await user.click(screen.getByRole('button', { name: /advanced/i }))
-    expect(new Set(texts).size).toBe(3)
+    await user.click(screen.getByRole('button', { name: /proficient/i }))
+    expect(new Set(texts).size).toBe(4)
   })
 })
