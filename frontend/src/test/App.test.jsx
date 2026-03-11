@@ -152,6 +152,35 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: /score my english/i })).not.toBeDisabled()
   })
 
+  it('renders the clear button', () => {
+    render(<App />)
+    expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument()
+  })
+
+  it('clear button is disabled when text area is empty', () => {
+    render(<App />)
+    expect(screen.getByRole('button', { name: /clear/i })).toBeDisabled()
+  })
+
+  it('clear button empties the textarea', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.type(screen.getByRole('textbox'), VALID_TEXT)
+    await user.click(screen.getByRole('button', { name: /clear/i }))
+    expect(screen.getByRole('textbox').value).toBe('')
+  })
+
+  it('clear button dismisses results', async () => {
+    scorer.scoreText.mockResolvedValue(mockResult)
+    const user = userEvent.setup()
+    render(<App />)
+    await user.type(screen.getByRole('textbox'), VALID_TEXT)
+    await user.click(screen.getByRole('button', { name: /score my english/i }))
+    await waitFor(() => screen.getByTestId('results-section'))
+    await user.click(screen.getByRole('button', { name: /clear/i }))
+    expect(screen.queryByTestId('results-section')).not.toBeInTheDocument()
+  })
+
   it('clears error and results when user edits text after scoring', async () => {
     scorer.scoreText.mockResolvedValue(mockResult)
     const user = userEvent.setup()
