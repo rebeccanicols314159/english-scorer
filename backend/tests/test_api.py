@@ -1,7 +1,14 @@
 """Tests for the FastAPI HTTP endpoints."""
 import pytest
 from httpx import AsyncClient, ASGITransport
-from app.main import app
+from app.main import app, rate_limiter
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    rate_limiter.reset()
+    yield
+    rate_limiter.reset()
 
 
 @pytest.fixture
@@ -202,3 +209,43 @@ class TestLanguageDetection:
         response = await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
         assert response.status_code == 200
         assert response.json()["success"] is True
+
+
+class TestRateLimiting:
+    async def test_requests_within_limit_succeed(self, client):
+        for _ in range(5):
+            response = await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+            assert response.status_code == 200
+
+    async def test_exceeding_limit_returns_429(self, client):
+        rate_limiter.limit = 3
+        for _ in range(3):
+            await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        response = await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        assert response.status_code == 429
+
+    async def test_429_response_has_success_false(self, client):
+        rate_limiter.limit = 1
+        await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        response = await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        assert response.json()["success"] is False
+
+    async def test_429_response_has_rate_limited_code(self, client):
+        rate_limiter.limit = 1
+        await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        response = await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        assert response.json()["error"]["code"] == "RATE_LIMITED"
+
+    async def test_429_response_has_message(self, client):
+        rate_limiter.limit = 1
+        await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        response = await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        message = response.json()["error"]["message"]
+        assert isinstance(message, str) and len(message) > 0
+
+    async def test_rate_limit_does_not_apply_to_health(self, client):
+        rate_limiter.limit = 1
+        await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        response = await client.get("/health")
+        assert response.status_code == 200
