@@ -21,16 +21,26 @@ const EXAMPLES = {
     "In addition, I watch English movies to improve my listening skills. " +
     "I think that consistency is the key to success in language learning.",
   Proficient:
-    "The proliferation of digital technologies has fundamentally transformed the manner " +
-    "in which contemporary societies engage with information. Consequently, educational " +
-    "institutions are grappling with unprecedented challenges in preparing students for " +
-    "a rapidly evolving knowledge economy. Furthermore, researchers have identified " +
-    "several promising pedagogical approaches that leverage technology to enhance learning " +
-    "outcomes. Nevertheless, the long-term implications of widespread internet access on " +
-    "cognitive development remain poorly understood, despite numerous empirical studies " +
-    "attempting to quantify these effects. The evidence suggests that thoughtful integration " +
-    "of digital tools, rather than wholesale adoption or rejection, yields the most " +
-    "beneficial educational results.",
+    "The proliferation of digital technologies has transformed the manner in which " +
+    "contemporary societies engage with knowledge. Consequently, educational institutions " +
+    "are grappling with unprecedented challenges as they prepare students for a rapidly " +
+    "changing world. Reform is overdue.\n\n" +
+    "Furthermore, researchers have identified several pedagogical approaches that leverage " +
+    "technology to enhance learning outcomes, although the evidence for many of these " +
+    "methods remains preliminary and contested. Nevertheless, institutions that embrace a " +
+    "phased approach tend to develop more sustainable practices than those that rush. " +
+    "Similarly, educators who receive ongoing professional development also demonstrate " +
+    "greater confidence in digital environments.\n\n" +
+    "In contrast, critics argue that digital tools may fragment attention and undermine the " +
+    "reading skills that students need to succeed academically. While this concern is " +
+    "understandable, evidence suggests that students who are taught to use technology " +
+    "deliberately can yet overcome these risks. Indeed, the strongest outcomes occur in " +
+    "schools that pair digital instruction with structured periods of reflection.\n\n" +
+    "In conclusion, despite numerous studies attempting to quantify these effects, cognitive " +
+    "development in digital contexts remains a complex issue that resists simple answers. " +
+    "Therefore, a balanced approach that integrates technology thoughtfully while preserving " +
+    "traditional pedagogical strengths represents the most viable path forward. Hence, the " +
+    "choice that each institution makes will define its educational future.",
 }
 
 export default function ExampleButtons({ onLoadExample }) {
