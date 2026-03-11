@@ -1,18 +1,18 @@
 const EXAMPLES = {
   Beginner:
-    "i am studing inglish becuase i want to comunicate with forein people. " +
-    "yesterday i writed a leter to my freind in america and he recieve it. " +
-    "my teacher she say i make alot of gramar mistaeks. " +
-    "i dont have very much vocablary but i try to lern new word every day. " +
-    "the inglish it is hard langauge for me to understood. " +
-    "my frend he also studyes inglish with i in the same clasroom.",
+    "i go to skool evry day and i liek it very much. " +
+    "my frend he go to skool to. we liek to play at skool. " +
+    "we lern inglish and maths. inglish is hard for me. " +
+    "my techer she very nice to us and she halp me alot. " +
+    "i dont now inglish good but i try evry day. " +
+    "my frend he also dont now inglish good.",
   Intermediate:
-    "I go to school yesterday and I have many friend there. " +
-    "The teacher she very kind to us student. " +
-    "We learn english grammar but it very hard for me. " +
-    "My friend he don't understand also. " +
-    "We both make many mistake on test. " +
-    "I am not very good at english but I try my best every day.",
+    "I go to school yesterday and I have many freind there. " +
+    "However, the teacher she very kind to all the students in our class. " +
+    "We are learning english grammar but it is very diffcult for me to understand. " +
+    "In addition, my friend he dont understand the lesson and we both make many mistaeks. " +
+    "My english speaking is not very good and I feel very embarased about it. " +
+    "I try my best every day to improve my english skills.",
   Advanced:
     "Learning English has been challenging but also rewarding for me. " +
     "I have improved my vocabulary by reading English books every day. " +
