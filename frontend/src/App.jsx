@@ -7,6 +7,7 @@ import ScoreBreakdown from './components/ScoreBreakdown'
 import FeedbackPanel from './components/FeedbackPanel'
 import LoadingSpinner from './components/LoadingSpinner'
 import ErrorMessage from './components/ErrorMessage'
+import ExampleButtons from './components/ExampleButtons'
 
 function wordCount(text) {
   return text.trim() === '' ? 0 : text.trim().split(/\s+/).length
@@ -55,6 +56,7 @@ export default function App() {
 
       <main className="max-w-3xl mx-auto px-4 py-8 flex flex-col gap-6">
         <section className="flex flex-col gap-4">
+          <ExampleButtons onLoadExample={handleTextChange} />
           <TextInput text={text} onTextChange={handleTextChange} />
           <div className="flex justify-end">
             <SubmitButton

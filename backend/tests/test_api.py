@@ -154,3 +154,51 @@ class TestScoreEndpoint:
         response = await client.post("/api/score", json={"text": long_text})
         confidence = response.json()["data"]["confidence_level"]
         assert confidence == "very_high"
+
+
+class TestLanguageDetection:
+    FRENCH_TEXT = (
+        "Le français est une langue romane dont les locuteurs sont appelés francophones. "
+        "Elle est parlée sur les cinq continents par environ trois cent millions de personnes. "
+        "La langue française est issue du latin vulgaire parlé en Gaule romaine."
+    )
+    SPANISH_TEXT = (
+        "El español es una lengua romance que pertenece a la familia indoeuropea. "
+        "Es el segundo idioma más hablado del mundo por número de hablantes nativos. "
+        "Se habla principalmente en España y en América Latina."
+    )
+    GERMAN_TEXT = (
+        "Die deutsche Sprache ist eine westgermanische Sprache. "
+        "Sie wird von etwa 100 Millionen Menschen als Muttersprache gesprochen. "
+        "Deutsch ist die meistgesprochene Muttersprache in der Europäischen Union."
+    )
+
+    async def test_french_text_returns_422(self, client):
+        response = await client.post("/api/score", json={"text": self.FRENCH_TEXT})
+        assert response.status_code == 422
+
+    async def test_spanish_text_returns_422(self, client):
+        response = await client.post("/api/score", json={"text": self.SPANISH_TEXT})
+        assert response.status_code == 422
+
+    async def test_german_text_returns_422(self, client):
+        response = await client.post("/api/score", json={"text": self.GERMAN_TEXT})
+        assert response.status_code == 422
+
+    async def test_non_english_error_code(self, client):
+        response = await client.post("/api/score", json={"text": self.FRENCH_TEXT})
+        assert response.json()["error"]["code"] == "NOT_ENGLISH"
+
+    async def test_non_english_success_false(self, client):
+        response = await client.post("/api/score", json={"text": self.FRENCH_TEXT})
+        assert response.json()["success"] is False
+
+    async def test_non_english_has_message(self, client):
+        response = await client.post("/api/score", json={"text": self.FRENCH_TEXT})
+        message = response.json()["error"]["message"]
+        assert isinstance(message, str) and len(message) > 0
+
+    async def test_english_text_still_scores(self, client):
+        response = await client.post("/api/score", json={"text": TestScoreEndpoint.VALID_TEXT})
+        assert response.status_code == 200
+        assert response.json()["success"] is True
