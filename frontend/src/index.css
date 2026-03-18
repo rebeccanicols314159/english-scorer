@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes grow-bar {
+  from { width: 0; }
+  to   { width: var(--bar-width); }
+}

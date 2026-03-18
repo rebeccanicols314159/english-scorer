@@ -40,10 +40,10 @@ describe('ScoreBreakdown', () => {
 
   it('progress bar width reflects score proportion (score/10 * 100%)', () => {
     render(<ScoreBreakdown scores={sampleScores} />)
-    // Grammar = 8.0 → 80% width
+    // Grammar = 8.0 → --bar-width: 80%
     const bars = screen.getAllByRole('progressbar')
     const grammarBar = bars.find(b => b.getAttribute('aria-label')?.match(/grammar/i))
-    expect(grammarBar).toHaveStyle({ width: '80%' })
+    expect(grammarBar.style.getPropertyValue('--bar-width')).toBe('80%')
   })
 
   it('high score bar has green color', () => {

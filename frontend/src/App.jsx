@@ -103,7 +103,7 @@ export default function App() {
         />
 
         {result && (
-          <section data-testid="results-section" className="flex flex-col gap-4">
+          <section data-testid="results-section" className="flex flex-col gap-4 animate-[fade-in_0.4s_ease-out_both]">
             <div className="flex justify-end">
               <button
                 onClick={() => exportPdf(result)}
