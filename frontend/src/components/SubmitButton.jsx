@@ -1,4 +1,4 @@
-export default function SubmitButton({ disabled, loading, onClick }) {
+export default function SubmitButton({ disabled, loading, onClick, className }) {
   const isDisabled = disabled || loading
 
   return (
@@ -9,7 +9,7 @@ export default function SubmitButton({ disabled, loading, onClick }) {
         ${isDisabled
           ? 'bg-gray-400 cursor-not-allowed'
           : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
-        }`}
+        }${className ? ` ${className}` : ''}`}
     >
       {loading ? 'Scoring…' : 'Score My English'}
     </button>

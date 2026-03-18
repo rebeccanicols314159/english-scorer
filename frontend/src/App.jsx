@@ -65,7 +65,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
-        <div className="max-w-3xl mx-auto px-4 py-5">
+        <div className="max-w-3xl mx-auto px-4 py-3 sm:py-5">
           <h1 className="text-2xl font-bold text-blue-700">English Scorer</h1>
           <p className="text-sm text-gray-500 mt-1">
             Paste your English text below to get an instant proficiency score.
@@ -73,15 +73,15 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8 flex flex-col gap-6">
+      <main className="max-w-3xl mx-auto px-4 py-5 sm:py-8 flex flex-col gap-6">
         <section className="flex flex-col gap-4">
           <ExampleButtons onLoadExample={handleTextChange} />
           <TextInput text={text} onTextChange={handleTextChange} />
-          <div className="flex justify-end gap-2">
+          <div className="flex gap-2 sm:justify-end">
             <button
               onClick={() => handleTextChange('')}
               disabled={isTextEmpty}
-              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:border-red-400 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:border-red-400 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               Clear
             </button>
@@ -89,6 +89,7 @@ export default function App() {
               disabled={isTextEmpty}
               loading={loading}
               onClick={handleSubmit}
+              className="w-full sm:w-auto"
             />
           </div>
         </section>
@@ -102,7 +103,7 @@ export default function App() {
         />
 
         {result && (
-          <section data-testid="results-section" className="flex flex-col gap-4">
+          <section data-testid="results-section" className="flex flex-col gap-4 animate-[fade-in_0.4s_ease-out_both]">
             <div className="flex justify-end">
               <button
                 onClick={() => exportPdf(result)}
