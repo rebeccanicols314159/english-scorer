@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { scoreText } from './api/scorer'
+import { exportPdf } from './utils/exportPdf'
 import TextInput from './components/TextInput'
 import SubmitButton from './components/SubmitButton'
 import OverallScore from './components/OverallScore'
@@ -12,6 +13,13 @@ import ExampleButtons from './components/ExampleButtons'
 function wordCount(text) {
   return text.trim() === '' ? 0 : text.trim().split(/\s+/).length
 }
+
+const SUGGESTIONS = {
+  NETWORK_ERROR: 'Please check your connection and try again.',
+  PROCESSING_ERROR: 'Please try again in a moment.',
+}
+
+const RETRYABLE = new Set(['RATE_LIMITED', 'NETWORK_ERROR', 'PROCESSING_ERROR'])
 
 export default function App() {
   const [text, setText] = useState('')
@@ -30,6 +38,10 @@ export default function App() {
   }
 
   async function handleSubmit() {
+    if (wordCount(text) < 5) {
+      setError({ message: 'Please enter at least 5 words.', code: 'INVALID_INPUT' })
+      return
+    }
     setLoading(true)
     setError(null)
     setResult(null)
@@ -37,10 +49,17 @@ export default function App() {
       const data = await scoreText(text)
       setResult(data)
     } catch (err) {
-      setError(err.message ?? 'An unexpected error occurred. Please try again.')
+      setError({
+        message: err.message ?? 'An unexpected error occurred. Please try again.',
+        code: err.code ?? 'PROCESSING_ERROR',
+      })
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleRetry() {
+    await handleSubmit()
   }
 
   return (
@@ -76,10 +95,22 @@ export default function App() {
 
         {loading && <LoadingSpinner />}
 
-        <ErrorMessage message={error} />
+        <ErrorMessage
+          message={error?.message}
+          suggestion={error ? (SUGGESTIONS[error.code] ?? null) : null}
+          onRetry={error && RETRYABLE.has(error.code) ? handleRetry : null}
+        />
 
         {result && (
           <section data-testid="results-section" className="flex flex-col gap-4">
+            <div className="flex justify-end">
+              <button
+                onClick={() => exportPdf(result)}
+                className="px-4 py-2 text-sm font-medium text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+              >
+                Download PDF
+              </button>
+            </div>
             <OverallScore
               overallScore={result.overall_score}
               proficiencyLevel={result.proficiency_level}
