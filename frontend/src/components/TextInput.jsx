@@ -12,7 +12,7 @@ export default function TextInput({ text, onTextChange }) {
   return (
     <div className="flex flex-col gap-2">
       <textarea
-        className="w-full min-h-52 p-4 border border-gray-300 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 text-base"
+        className="w-full min-h-32 sm:min-h-52 p-3 sm:p-4 border border-gray-300 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 text-base"
         placeholder="Paste or type your English text here..."
         value={text}
         onChange={e => onTextChange(e.target.value)}

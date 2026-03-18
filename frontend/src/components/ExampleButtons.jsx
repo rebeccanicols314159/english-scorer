@@ -51,7 +51,7 @@ export default function ExampleButtons({ onLoadExample }) {
         <button
           key={level}
           onClick={() => onLoadExample(text)}
-          className="text-sm px-3 py-1 rounded-full border border-gray-300 text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors cursor-pointer"
+          className="text-sm px-3 py-2 rounded-full border border-gray-300 text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors cursor-pointer"
         >
           {level}
         </button>
