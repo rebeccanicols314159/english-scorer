@@ -40,6 +40,7 @@ class SubcategoryFeedback(BaseModel):
 class ScoreData(BaseModel):
     overall_score: float
     proficiency_level: str
+    cefr_level: str
     subcategory_scores: SubcategoryScores
     feedback: SubcategoryFeedback
     confidence_level: str

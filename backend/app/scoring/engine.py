@@ -31,6 +31,16 @@ _PROFICIENCY_LEVELS = [
     (10.0, "Proficient"),
 ]
 
+_CEFR_LEVELS = [
+    (2.0, "A1"),
+    (3.5, "A2"),
+    (5.0, "B1"),
+    (6.5, "B2"),
+    (7.5, "C1"),
+    (8.5, "C1+"),
+    (10.0, "C2"),
+]
+
 # Instantiate analyzers once at module level (no re-loading on each request)
 _grammar = GrammarAnalyzer()
 _vocabulary = VocabularyAnalyzer()
@@ -66,6 +76,13 @@ def get_proficiency_level(score: float) -> str:
         if score <= threshold:
             return label
     return "Proficient"
+
+
+def get_cefr_level(score: float) -> str:
+    for threshold, label in _CEFR_LEVELS:
+        if score <= threshold:
+            return label
+    return "C2"
 
 
 # ── Core scoring functions ─────────────────────────────────────────────────────

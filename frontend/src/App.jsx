@@ -115,6 +115,7 @@ export default function App() {
             <OverallScore
               overallScore={result.overall_score}
               proficiencyLevel={result.proficiency_level}
+              cefrLevel={result.cefr_level}
               confidenceLevel={result.confidence_level}
               wordCount={result.word_count}
             />

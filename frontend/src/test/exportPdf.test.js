@@ -18,6 +18,7 @@ import { exportPdf } from '../utils/exportPdf'
 const mockResult = {
   overall_score: 7.5,
   proficiency_level: 'Upper-Intermediate',
+  cefr_level: 'C1',
   confidence_level: 'high',
   word_count: 145,
   subcategory_scores: {
@@ -78,6 +79,21 @@ describe('exportPdf', () => {
     exportPdf(mockResult)
     expect(allTextArgs()).toEqual(
       expect.arrayContaining([expect.stringContaining('Upper-Intermediate')])
+    )
+  })
+
+  it('includes CEFR level in the proficiency line', () => {
+    exportPdf(mockResult)
+    expect(allTextArgs()).toEqual(
+      expect.arrayContaining([expect.stringContaining('C1')])
+    )
+  })
+
+  it('omits CEFR prefix when cefr_level is absent', () => {
+    const { cefr_level, ...resultWithoutCefr } = mockResult
+    exportPdf(resultWithoutCefr)
+    expect(allTextArgs()).toEqual(
+      expect.arrayContaining([expect.stringContaining('Proficiency: Upper-Intermediate')])
     )
   })
 

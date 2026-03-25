@@ -62,6 +62,11 @@ class TestScoreEndpoint:
         assert isinstance(level, str)
         assert len(level) > 0
 
+    async def test_response_has_cefr_level(self, client):
+        response = await client.post("/api/score", json={"text": self.VALID_TEXT})
+        cefr = response.json()["data"]["cefr_level"]
+        assert cefr in {"A1", "A2", "B1", "B2", "C1", "C1+", "C2"}
+
     async def test_response_has_all_subcategory_scores(self, client):
         response = await client.post("/api/score", json={"text": self.VALID_TEXT})
         subcategories = response.json()["data"]["subcategory_scores"]

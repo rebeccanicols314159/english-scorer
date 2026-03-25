@@ -5,6 +5,7 @@ import OverallScore from '../components/OverallScore'
 const defaultProps = {
   overallScore: 7.5,
   proficiencyLevel: 'Upper-Intermediate',
+  cefrLevel: 'C1',
   confidenceLevel: 'high',
   wordCount: 150,
 }
@@ -58,5 +59,16 @@ describe('OverallScore', () => {
   it('shows score out of 10', () => {
     render(<OverallScore {...defaultProps} />)
     expect(screen.getByText(/\/ 10/)).toBeInTheDocument()
+  })
+
+  it('displays the CEFR level', () => {
+    render(<OverallScore {...defaultProps} />)
+    expect(screen.getByText(/C1/)).toBeInTheDocument()
+  })
+
+  it('renders without cefrLevel prop gracefully', () => {
+    const { cefrLevel, ...propsWithoutCefr } = defaultProps
+    render(<OverallScore {...propsWithoutCefr} />)
+    expect(screen.getByText(/upper-intermediate/i)).toBeInTheDocument()
   })
 })

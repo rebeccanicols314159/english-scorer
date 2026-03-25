@@ -7,6 +7,7 @@ from app.scoring.engine import (
     count_sentences,
     get_confidence_level,
     get_proficiency_level,
+    get_cefr_level,
     compute_subcategory_scores,
     compute_all_diagnostics,
     compute_overall_score,
@@ -104,6 +105,50 @@ class TestGetProficiencyLevel:
 
     def test_score_10_is_proficient(self):
         assert get_proficiency_level(10.0) == "Proficient"
+
+
+class TestGetCefrLevel:
+    def test_score_1_is_a1(self):
+        assert get_cefr_level(1.0) == "A1"
+
+    def test_score_2_is_a1(self):
+        assert get_cefr_level(2.0) == "A1"
+
+    def test_score_2_1_is_a2(self):
+        assert get_cefr_level(2.1) == "A2"
+
+    def test_score_3_5_is_a2(self):
+        assert get_cefr_level(3.5) == "A2"
+
+    def test_score_3_6_is_b1(self):
+        assert get_cefr_level(3.6) == "B1"
+
+    def test_score_5_is_b1(self):
+        assert get_cefr_level(5.0) == "B1"
+
+    def test_score_5_1_is_b2(self):
+        assert get_cefr_level(5.1) == "B2"
+
+    def test_score_6_5_is_b2(self):
+        assert get_cefr_level(6.5) == "B2"
+
+    def test_score_6_6_is_c1(self):
+        assert get_cefr_level(6.6) == "C1"
+
+    def test_score_7_5_is_c1(self):
+        assert get_cefr_level(7.5) == "C1"
+
+    def test_score_7_6_is_c1_plus(self):
+        assert get_cefr_level(7.6) == "C1+"
+
+    def test_score_8_5_is_c1_plus(self):
+        assert get_cefr_level(8.5) == "C1+"
+
+    def test_score_8_6_is_c2(self):
+        assert get_cefr_level(8.6) == "C2"
+
+    def test_score_10_is_c2(self):
+        assert get_cefr_level(10.0) == "C2"
 
 
 class TestWeights:
