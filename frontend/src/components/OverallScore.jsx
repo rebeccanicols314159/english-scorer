@@ -11,7 +11,7 @@ function scoreColor(score) {
   return 'text-red-500'
 }
 
-export default function OverallScore({ overallScore, proficiencyLevel, confidenceLevel, wordCount }) {
+export default function OverallScore({ overallScore, proficiencyLevel, cefrLevel, confidenceLevel, wordCount }) {
   return (
     <div className="bg-white rounded-xl shadow p-4 sm:p-6 text-center">
       <p className="text-gray-500 text-sm mb-1">Overall Score</p>
@@ -26,7 +26,10 @@ export default function OverallScore({ overallScore, proficiencyLevel, confidenc
         <span className="text-xl sm:text-2xl text-gray-400">/ 10</span>
       </div>
 
-      <p className="mt-2 text-xl font-semibold text-gray-700">{proficiencyLevel}</p>
+      <p className="mt-2 text-xl font-semibold text-gray-700">
+        {cefrLevel && <span className="text-blue-600 mr-1">{cefrLevel} –</span>}
+        {proficiencyLevel}
+      </p>
 
       <p className="mt-3 text-sm text-gray-500">
         {wordCount} words &middot; {CONFIDENCE_LABELS[confidenceLevel]}

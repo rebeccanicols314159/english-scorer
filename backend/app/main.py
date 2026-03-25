@@ -13,6 +13,7 @@ from app.scoring.engine import (
     compute_overall_score,
     get_confidence_level,
     get_proficiency_level,
+    get_cefr_level,
 )
 from app.scoring.feedback import generate_feedback
 from app.scoring.language_detection import is_english
@@ -92,6 +93,7 @@ def score_text(request: ScoreRequest) -> ScoreResponse:
     overall_score = compute_overall_score(subcategory_scores)
     confidence_level = get_confidence_level(word_count)
     proficiency_level = get_proficiency_level(overall_score)
+    cefr_level = get_cefr_level(overall_score)
     feedback = generate_feedback(subcategory_scores, diagnostics)
 
     return ScoreResponse(
@@ -99,6 +101,7 @@ def score_text(request: ScoreRequest) -> ScoreResponse:
         data=ScoreData(
             overall_score=overall_score,
             proficiency_level=proficiency_level,
+            cefr_level=cefr_level,
             subcategory_scores=SubcategoryScores(**subcategory_scores),
             feedback=SubcategoryFeedback(**feedback),
             confidence_level=confidence_level,

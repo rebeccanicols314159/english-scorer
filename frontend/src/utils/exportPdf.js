@@ -42,7 +42,8 @@ export function exportPdf(result) {
   doc.setFontSize(11)
   doc.text(`${result.overall_score.toFixed(1)} / 10`, 20, 39)
   doc.setFontSize(9)
-  doc.text(`Proficiency: ${result.proficiency_level}`, 20, 46)
+  const cefrPrefix = result.cefr_level ? `${result.cefr_level} – ` : ''
+  doc.text(`Proficiency: ${cefrPrefix}${result.proficiency_level}`, 20, 46)
   const confidence = result.confidence_level.charAt(0).toUpperCase() + result.confidence_level.slice(1)
   doc.text(`${confidence} confidence · ${result.word_count} words`, 20, 52)
 
